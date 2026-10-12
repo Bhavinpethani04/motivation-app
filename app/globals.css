@@ -1,26 +1,267 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   An anatomical plate book, reimagined.
+   Paper, ink, one oxblood accent, a strict grid and printed labels.
+   --------------------------------------------------------------------------- */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #faf8f4;
+  --paper-sunk: #f2eee6;
+
+  --ink: #1c1a17;
+  --ink-70: rgba(28, 26, 23, 0.7);
+  --ink-45: rgba(28, 26, 23, 0.45);
+  --rule: rgba(28, 26, 23, 0.18);
+  --rule-soft: rgba(28, 26, 23, 0.09);
+
+  --accent: #7b2232;
+  --accent-soft: rgba(123, 34, 50, 0.1);
+
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-paper: var(--paper);
+  --color-paper-sunk: var(--paper-sunk);
+  --color-ink: var(--ink);
+  --color-ink-70: var(--ink-70);
+  --color-ink-45: var(--ink-45);
+  --color-rule: var(--rule);
+  --color-rule-soft: var(--rule-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --font-serif: var(--font-spectral);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-spectral), Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* --- Scripts ---------------------------------------------------------------
+   Quotes appear in English, Hindi and Gujarati on the same page, so each block
+   declares its own face rather than inheriting one global language.
+   --------------------------------------------------------------------------- */
+
+.script-hi {
+  font-family: var(--font-devanagari), serif;
+}
+.script-gu {
+  font-family: var(--font-gujarati), serif;
+}
+
+/* Devanagari and Gujarati have no true italic; a synthetic slant looks wrong. */
+.serif-italic {
+  font-style: italic;
+}
+.script-hi.serif-italic,
+.script-gu.serif-italic,
+.script-hi .serif-italic,
+.script-gu .serif-italic {
+  font-style: normal;
+}
+
+/* Indic needs a touch more leading than the Latin serif. */
+.script-hi,
+.script-gu {
+  line-height: 1.45;
+}
+
+/* --- Printed furniture ------------------------------------------------------ */
+
+/* Specimen labels, figure numbers, running heads. */
+.label {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+.label-sm {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+}
+
+/* Indic inside a label: the mono face has no Devanagari or Gujarati, and heavy
+   tracking pulls a letter away from its own vowel sign. */
+.label.script-hi,
+.label.script-gu,
+.label .script-hi,
+.label .script-gu {
+  letter-spacing: 0.03em;
+  text-transform: none;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+/* Paper grain, over the plate but under the text. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.24'/%3E%3C/svg%3E");
+}
+
+/* Keeps a block of text legible where the drawing runs behind it. The wash
+   comes in from the text's own edge, so the specimen keeps the other half. */
+.plate-scrim {
+  position: absolute;
+  inset: -2.5rem -3rem;
+  pointer-events: none;
+}
+.plate-scrim-left {
+  background: linear-gradient(
+    to right,
+    var(--paper) 0%,
+    var(--paper) 62%,
+    rgba(250, 248, 244, 0) 100%
+  );
+}
+.plate-scrim-right {
+  background: linear-gradient(
+    to left,
+    var(--paper) 0%,
+    var(--paper) 62%,
+    rgba(250, 248, 244, 0) 100%
+  );
+}
+.plate-scrim-center {
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 50%,
+    var(--paper) 0%,
+    var(--paper) 58%,
+    rgba(250, 248, 244, 0) 100%
+  );
+}
+
+/* A section taller than the viewport would show the wash's top and bottom
+   edges as hard horizontal seams. */
+.plate-scrim-flow {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+}
+
+/* Narrow screens: the drawing sits behind the text, so wash the whole column. */
+@media (max-aspect-ratio: 9/10) {
+  .plate-scrim-left,
+  .plate-scrim-right,
+  .plate-scrim-center {
+    background: linear-gradient(
+      to bottom,
+      rgba(250, 248, 244, 0) 0%,
+      var(--paper) 10%,
+      var(--paper) 90%,
+      rgba(250, 248, 244, 0) 100%
+    );
+  }
+}
+
+/* --- Entrance states -------------------------------------------------------- */
+
+[data-w] {
+  opacity: 0.18;
+}
+
+[data-fade] {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+[data-draw] {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-w] {
+    opacity: 1;
+  }
+  [data-fade] {
+    opacity: 1;
+    transform: none;
+  }
+  [data-draw] {
+    transform: none;
+  }
+}
+
+/* --- Loading cover ---------------------------------------------------------- */
+
+.intro {
+  transition:
+    opacity 1s ease,
+    visibility 0s linear 1s;
+}
+html[data-ready="true"] .intro {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes plate-line {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50.01% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
