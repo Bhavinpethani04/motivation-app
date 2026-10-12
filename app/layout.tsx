@@ -45,6 +45,9 @@ const fonts = [spectral, plexMono, devanagari, gujarati]
 export const metadata: Metadata = {
   title: `${plate.title} — for ${site.name}`,
   description: `${plate.subtitle}. Made for ${site.name}, on the way to becoming a Registered Physiotherapist.`,
+  // This is a private letter with her name on it. The link still works for
+  // anyone she shares it with; it just stays out of search results.
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
